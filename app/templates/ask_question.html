@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Ask a Question - StudentOverflow</title>
+    <link rel="stylesheet" href="../static/css/styles.css">
+
+</head>
+
+<body>
+    <div class="container">
+        <h2>Ask a Question</h2>
+        <form action="/ask" method="POST">
+            <div class="form-group">
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="content">Content:</label>
+                <textarea id="content" name="content" rows="10" required></textarea>
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+        <p><a href="/">Back to Home</a></p>
+    </div>
+</body>
+
+</html>

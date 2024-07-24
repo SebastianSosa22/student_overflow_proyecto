@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Question Title - StudentOverflow</title>
+    <link rel="stylesheet" href="../static/css/styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h2>Question Title</h2>
+        <p>Asked by <a href="/user/profile">username</a> on <date></date>
+        </p>
+        <p id="question-content">Question content goes here.</p>
+        <div id="answers">
+            <h3>Answers</h3>
+            <!-- Answers will be loaded here -->
+        </div>
+        <div id="add-answer">
+            <h3>Your Answer</h3>
+            <form action="/question/{question_id}/answer" method="POST">
+                <div class="form-group">
+                    <textarea id="answer-content" name="content" rows="5" required></textarea>
+                </div>
+                <button type="submit">Submit Answer</button>
+            </form>
+        </div>
+        <p><a href="/">Back to Home</a></p>
+    </div>
+</body>
+
+</html>
