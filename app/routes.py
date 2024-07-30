@@ -1,61 +1,82 @@
-from flask import render_template, redirect, url_for, request, flash
-from flask_login import login_user, login_required, logout_user, current_user
-from . import db
-from .models import User, Question, Answer
+from flask import Blueprint, render_template, redirect, url_for, request, jsonify
+from flask_login import login_user, login_required, logout_user, current_user, LoginManager
+from flask_jwt_extended import create_access_token
+from .models import db, User, Question, Answer
 from .forms import LoginForm, SignupForm, QuestionForm, AnswerForm
+from . import bcrypt
 
 
-from . import create_app
-app = create_app()
+main = Blueprint('main', __name__)
 
-@app.route('/')
+
+@main.route('/')
+@login_required
 def home():
-    print("Home route accessed")
     questions = Question.query.all()
     return render_template('home.html', questions=questions)
 
-@app.route('/login', methods=['GET', 'POST'])
+
+@main.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
+    print(form.validate_on_submit())
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user and user.check_password(form.password.data):
+        print(form)
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user)
-            return redirect(url_for('home'))
-        else:
-            flash('Invalid email or password')
+            access_token = create_access_token(
+                identity={'username': user.username, 'role': user.role})
+            print(access_token)
+            return redirect(url_for('main.home'))
+        # jsonify(access_token=access_token), 200
+        return jsonify({"msg": "Bad username or password"}), 401
     return render_template('login.html', form=form)
 
-@app.route('/signup', methods=['GET', 'POST'])
+
+@main.route('/signup', methods=['GET', 'POST'])
 def signup():
     form = SignupForm()
     if form.validate_on_submit():
-        user = User(email=form.email.data, username=form.username.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
+        hashed_password = bcrypt.generate_password_hash(
+            form.password.data).decode('utf-8')
+        new_user = User(username=form.username.data, email=form.email.data,
+                        password=hashed_password, role='standard')
+        db.session.add(new_user)
         db.session.commit()
-        login_user(user)
-        return redirect(url_for('home'))
+        return redirect(url_for('main.login'))
     return render_template('signup.html', form=form)
 
-@app.route('/ask', methods=['GET', 'POST'])
+
+@main.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('main.login'))
+
+
+@main.route('/ask', methods=['GET', 'POST'])
 @login_required
 def ask():
     form = QuestionForm()
     if form.validate_on_submit():
-        question = Question(title=form.title.data, content=form.content.data, user_id=current_user.id)
-        db.session.add(question)
+        new_question = Question(title=form.title.data,
+                                content=form.content.data, author=current_user)
+        db.session.add(new_question)
         db.session.commit()
-        return redirect(url_for('home'))
+        return redirect(url_for('main.home'))
     return render_template('ask.html', form=form)
 
-@app.route('/question/<int:id>', methods=['GET', 'POST'])
-def question(id):
-    question = Question.query.get_or_404(id)
+
+@main.route('/question/<int:question_id>', methods=['GET', 'POST'])
+@login_required
+def question(question_id):
+    question = Question.query.get_or_404(question_id)
     form = AnswerForm()
     if form.validate_on_submit():
-        answer = Answer(content=form.content.data, question_id=id, user_id=current_user.id)
-        db.session.add(answer)
+        new_answer = Answer(content=form.content.data,
+                            question=question, author=current_user)
+        db.session.add(new_answer)
         db.session.commit()
-    answers = Answer.query.filter_by(question_id=id).all()
-    return render_template('question.html', question=question, answers=answers, form=form)
+        return redirect(url_for('main.question', question_id=question.id))
+    return render_template('question.html', question=question, form=form)
