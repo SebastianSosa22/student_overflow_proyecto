@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudentOverflow - Configuración</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+    <header class="bg-white shadow-sm py-4 sticky top-0">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-800"><a href="/">StudentOverflow</a></h1>
+            <div class="relative">
+                <div class="flex items-center space-x-4 cursor-pointer" id="userMenu" onclick="toggleDropdown()">
+                    <span class="text-gray-700 font-medium">Sebastian Sosa</span>
+                    <img src="https://via.placeholder.com/40" alt="Foto de perfil"
+                        class="w-10 h-10 rounded-full border border-gray-300">
+                </div>
+                <div id="dropdownMenu"
+                    class="dropdown-menu absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2 hidden">
+                    <a href="/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Perfil</a>
+                    <a href="/settings" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Configuración</a>
+                    <a href="/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Cerrar sesión</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+        <h2 class="text-3xl font-semibold text-gray-800 mb-6">Configuración</h2>
+        <form action="#" method="POST" enctype="multipart/form-data">
+            <!-- Sección para cambiar la foto de perfil -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700">Foto de Perfil</label>
+                <div class="mt-2 flex items-center">
+                    <img id="profilePic" src="https://via.placeholder.com/100" alt="Foto de perfil actual"
+                        class="w-24 h-24 rounded-full border border-gray-300">
+                    <input type="file" id="profilePicInput" name="profilePic" accept="image/*" class="ml-4">
+                </div>
+                <!-- Botón para eliminar la foto de perfil -->
+                <button type="button" id="removePicButton"
+                    class="mt-4 bg-red-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-50">Eliminar
+                    Foto</button>
+                <!-- Mensaje de error de tamaño -->
+                <p id="sizeError" class="mt-2 text-red-600 hidden">El archivo es demasiado grande. Seleccione una imagen
+                    de menos de 2 MB.</p>
+            </div>
+
+            <!-- Campo para el nombre -->
+            <div class="mb-4">
+                <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
+                <input type="text" id="nombre" name="nombre" value="Sebastian Sosa"
+                    class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+            </div>
+
+            <!-- Campo para el correo electrónico -->
+            <div class="mb-4">
+                <label for="email" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+                <input type="email" id="email" name="email" value="sebastian.sosa@example.com"
+                    class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+            </div>
+
+            <!-- Campo para la contraseña -->
+            <div class="mb-4">
+                <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                <input type="password" id="password" name="password" placeholder="Deja en blanco para no cambiar"
+                    class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+            </div>
+
+            <!-- Campo para la biografía -->
+            <div class="mb-4">
+                <label for="bio" class="block text-sm font-medium text-gray-700">Biografía</label>
+                <textarea id="bio" name="bio" rows="4"
+                    class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</textarea>
+            </div>
+
+            <!-- Botón para guardar los cambios -->
+            <div class="text-right">
+                <button type="submit"
+                    class="bg-orange-500 text-white font-semibold py-2 px-6 rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-opacity-50">Guardar
+                    Cambios</button>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        // Tamaño máximo permitido (en bytes), aquí 2MB
+        const maxFileSize = 2 * 1024 * 1024;
+
+        // Mostrar la vista previa de la imagen seleccionada y verificar el tamaño
+        document.getElementById('profilePicInput').onchange = function (evt) {
+            var [file] = evt.target.files;
+            if (file) {
+                // Verificar el tamaño del archivo
+                if (file.size > maxFileSize) {
+                    document.getElementById('sizeError').classList.remove('hidden');
+                    document.getElementById('profilePic').src = 'https://via.placeholder.com/100';
+                    document.getElementById('profilePicInput').value = '';
+                } else {
+                    document.getElementById('sizeError').classList.add('hidden');
+                    document.getElementById('profilePic').src = URL.createObjectURL(file);
+                }
+            }
+        };
+
+        // Función para eliminar la foto de perfil
+        document.getElementById('removePicButton').onclick = function () {
+            document.getElementById('profilePic').src = 'https://via.placeholder.com/100';
+            document.getElementById('profilePicInput').value = '';
+            document.getElementById('sizeError').classList.add('hidden');
+        };
+
+        // Función para mostrar/ocultar el menú desplegable
+        function toggleDropdown() {
+            var dropdownMenu = document.getElementById("dropdownMenu");
+            dropdownMenu.classList.toggle("hidden");
+        }
+
+        // Cerrar el menú si se hace clic fuera de él
+        window.onclick = function (event) {
+            var dropdownMenu = document.getElementById("dropdownMenu");
+            if (!event.target.closest('#userMenu')) {
+                dropdownMenu.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudentOverflow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilo adicional para el menú desplegable */
+        .dropdown-menu {
+            display: none;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <header class="bg-white shadow-sm py-4 sticky top-0">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-800">StudentOverflow</h1>
+            <div class="relative">
+                <div class="flex items-center space-x-4 cursor-pointer" id="userMenu" onclick="toggleDropdown()">
+                    <!-- Nombre del usuario -->
+                    <span class="text-gray-700 font-medium">Sebastian Sosa</span>
+                    <!-- Foto del usuario -->
+                    <img src="https://via.placeholder.com/40" alt="Foto de perfil"
+                        class="w-10 h-10 rounded-full border border-gray-300">
+                </div>
+
+                <!-- Menú desplegable -->
+                <div id="dropdownMenu"
+                    class="dropdown-menu absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2">
+                    <a href="/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Perfil</a>
+                    <a href="/settings" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Configuración</a>
+                    <a href="/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Cerrar sesión</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto mt-8">
+
+    </main>
+
+    <script>
+        function toggleDropdown() {
+            var dropdownMenu = document.getElementById("dropdownMenu");
+            dropdownMenu.classList.toggle("show");
+        }
+
+        // Cerrar el menú si se hace clic fuera de él
+        window.onclick = function (event) {
+            var dropdownMenu = document.getElementById("dropdownMenu");
+            if (!event.target.closest('#userMenu')) {
+                if (dropdownMenu.classList.contains('show')) {
+                    dropdownMenu.classList.remove('show');
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

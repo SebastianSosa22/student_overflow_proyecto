@@ -3,30 +3,68 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Sign Up - StudentOverflow</title>
-    <link rel="stylesheet" href="../static/css/styles.css">
+    <title>Register - StudentOverflow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
-    <div class="container">
-        <h2>Sign Up</h2>
-        <form action="/signup" method="POST">
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+    <div class="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-4">StudentOverflow</h1>
+        <h2 class="text-xl font-semibold text-center text-gray-600 mb-6">Register</h2>
+        <form action="/login" method="POST" class="space-y-4">
             <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
+                {{ form.csrf_token }}
+                <label class="block text-sm font-medium text-gray-700" for="user">{{ form.username.label }}</label>
+                {{ form.username(size=20, class_="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none
+                focus:ring-2 focus:ring-orange-400 focus:border-transparent") }}
             </div>
             <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
+                <label class="block text-sm font-medium text-gray-700" for="email">{{ form.email.label }}</label>
+                {{ form.email(size=20, class_="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none
+                focus:ring-2 focus:ring-orange-400 focus:border-transparent") }}
             </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
+            <div class="form-group relative">
+                <label class="block text-sm font-medium text-gray-700" for="password">{{ form.password.label }}</label>
+                <div class="relative flex items-center">
+                    {{ form.password(size=20, class_="w-full px-3 py-2 border border-gray-300 rounded-lg
+                    focus:outline-none
+                    focus:ring-2 focus:ring-orange-400 focus:border-transparent", id="password") }}
+                    <button type="button" id="togglePassword" class="absolute right-3">
+                        <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12A3 3 0 11 9 12A3 3 0 0115 12zM2.458 12C3.732 7.943 7.523 5 12 5C16.477 5 20.268 7.943 21.542 12C20.268 16.057 16.477 19 12 19C7.523 19 3.732 16.057 2.458 12z" />
+                        </svg>
+                    </button>
+                </div>
             </div>
-            <button type="submit">Sign Up</button>
+            <div class="flex justify-center items-center mt-6">
+                <a href="/login"
+                    class="mx-4 px-4 py-2 text-orange-400 font-semibold border border-orange-400 rounded-lg hover:bg-orange-300 hover:text-white hover:border-transparent">
+                    Ya tengo cuenta
+                </a>
+                <button type="submit"
+                    class="mx-4 px-4 py-2 bg-orange-400 text-white font-semibold rounded-lg hover:bg-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-opacity-50">
+                    Registrarme
+                </button>
+            </div>
         </form>
-        <p>Already have an account? <a href="/login">Log in here</a></p>
     </div>
+
+    <script>
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordField = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        togglePassword.addEventListener('click', function () {
+            // Toggle the type attribute
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+
+            // Toggle the eye icon color
+            eyeIcon.classList.toggle('text-orange-400');
+        });
+    </script>
 </body>
 
 </html>

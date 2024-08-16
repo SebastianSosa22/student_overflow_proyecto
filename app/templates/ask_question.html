@@ -1,29 +1,113 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
-    <title>Ask a Question - StudentOverflow</title>
-    <link rel="stylesheet" href="../static/css/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudentOverflow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilo adicional para el menú desplegable */
+        .dropdown-menu {
+            display: none;
+        }
 
+        .dropdown-menu.show {
+            display: block;
+        }
+    </style>
 </head>
 
-<body>
-    <div class="container">
-        <h2>Ask a Question</h2>
-        <form action="/ask" method="POST">
-            <div class="form-group">
-                <label for="title">Title:</label>
-                <input type="text" id="title" name="title" required>
+<body class="bg-gray-100">
+
+    <header class="bg-white shadow-sm py-4 sticky top-0">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-800"><a href="/">StudentOverflow</a></h1>
+            <div class="relative">
+                <div class="flex items-center space-x-4 cursor-pointer" id="userMenu" onclick="toggleDropdown()">
+                    <!-- Nombre del usuario -->
+                    <span class="text-gray-700 font-medium">Sebastian Sosa</span>
+                    <!-- Foto del usuario -->
+                    <img src="https://via.placeholder.com/40" alt="Foto de perfil"
+                        class="w-10 h-10 rounded-full border border-gray-300">
+                </div>
+
+                <!-- Menú desplegable -->
+                <div id="dropdownMenu"
+                    class="dropdown-menu absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2">
+                    <a href="/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Perfil</a>
+                    <a href="/settings" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Configuración</a>
+                    <a href="/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Cerrar sesión</a>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="content">Content:</label>
-                <textarea id="content" name="content" rows="10" required></textarea>
-            </div>
-            <button type="submit">Submit</button>
-        </form>
-        <p><a href="/">Back to Home</a></p>
-    </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto mt-8">
+        <!-- Flecha de Regreso -->
+        <div class="mb-4">
+            <a href="javascript:history.back()" class="flex items-center text-gray-700 hover:text-gray-900">
+                <!-- Ícono de flecha hacia la izquierda -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                Regresar
+            </a>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-8">
+            <h1 class="text-3xl font-semibold text-gray-800 mb-6">Haz una pregunta pública</h1>
+            <form action="#" method="POST">
+                <div class="mb-4">
+                    <label for="titulo" class="block text-lg font-medium text-gray-700">Título</label>
+                    <p class="text-gray-500 text-base mb-2">Sé específico e imagina que le estás haciendo una pregunta a
+                        otra persona.</p>
+                    <input type="text" id="titulo" name="titulo" placeholder="Placeholder"
+                        class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                </div>
+
+                <div class="mb-4">
+                    <label for="detalle" class="block text-lg font-medium text-gray-700">¿Cuáles son los detalles de tu
+                        problema?</label>
+                    <p class="text-gray-500 text-base mb-2">Introduce el problema y amplía lo que pones en el título.
+                        Mínimo 20 caracteres.</p>
+                    <textarea id="detalle" name="detalle" rows="5" placeholder="Placeholder"
+                        class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"></textarea>
+                    <span class="text-gray-500 text-base float-right mt-10">0/50</span>
+                </div>
+
+                <div class="mb-6">
+                    <label for="etiquetas" class="block text-lg font-medium text-gray-700">Etiquetas</label>
+                    <p class="text-gray-500 text-base mb-2">Añade hasta 5 etiquetas para describir de qué se trata tu
+                        pregunta. Empieza a escribir para ver sugerencias.</p>
+                    <input type="text" id="etiquetas" name="etiquetas" placeholder="Placeholder"
+                        class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                </div>
+
+                <div class="text-right">
+                    <button type="submit"
+                        class="bg-orange-500 text-white font-semibold py-2 px-6 rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-opacity-50">Preguntar</button>
+                </div>
+            </form>
+        </div>
+
+        <script>
+            function toggleDropdown() {
+                var dropdownMenu = document.getElementById("dropdownMenu");
+                dropdownMenu.classList.toggle("show");
+            }
+
+            // Cerrar el menú si se hace clic fuera de él
+            window.onclick = function (event) {
+                var dropdownMenu = document.getElementById("dropdownMenu");
+                if (!event.target.closest('#userMenu')) {
+                    if (dropdownMenu.classList.contains('show')) {
+                        dropdownMenu.classList.remove('show');
+                    }
+                }
+            }
+        </script>
 </body>
 
 </html>
