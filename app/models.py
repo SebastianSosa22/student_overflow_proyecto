@@ -1,8 +1,9 @@
 from datetime import datetime
 from . import db
+from flask_login import UserMixin
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     __tablename__ = 'users'  # Nombre de la tabla en la base de datos
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
@@ -11,6 +12,8 @@ class User(db.Model):
     role = db.Column(db.String(50), nullable=False)
     questions = db.relationship('Question', backref='author', lazy=True)
     answers = db.relationship('Answer', backref='author', lazy=True)
+    @property
+    def is_active(self): return True
 
 
 class Question(db.Model):

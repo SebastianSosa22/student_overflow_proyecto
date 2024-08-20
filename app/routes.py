@@ -9,35 +9,36 @@ main = Blueprint('main', __name__)
 
 
 @main.route('/')
-# @login_required
+@login_required
 def home():
+    print("Hola mundo")
     questions = Question.query.all()
     return render_template('index.html', questions=questions)
 
 
 @main.route('/ask_question')
-# @login_required
+@login_required
 def ask_question():
     questions = Question.query.all()
     return render_template('ask_question.html', questions=questions)
 
 
 @main.route('/answer')
-# @login_required
+@login_required
 def answer():
     questions = Question.query.all()
     return render_template('answer.html', questions=questions)
 
 
 @main.route('/profile')
-# @login_required
+@login_required
 def profile():
     questions = Question.query.all()
     return render_template('profile.html', questions=questions)
 
 
 @main.route('/settings')
-# @login_required
+@login_required
 def settings():
     questions = Question.query.all()
     return render_template('settings.html', questions=questions)
@@ -47,11 +48,15 @@ def settings():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        print(form.email.data)
+        user = User.query.filter_by(email=form.email.data).first(
+        ) or User.query.filter_by(username=form.email.data).first()
+        print(user)
         if user:
             try:
                 if bcrypt.check_password_hash(user.password, form.password.data):
                     login_user(user)
+                    print("Inicio de sesion correcto")
                     access_token = create_access_token(
                         identity={'username': user.username, 'role': user.role})
                     return redirect(url_for('main.home'))
@@ -68,6 +73,14 @@ def login():
 @main.route('/register', methods=['GET', 'POST'])
 def signup():
     form = SignupForm()
+    print("--------------")
+    print("Username:")
+    print(form.username)
+    print("Email:")
+    print(form.email)
+    print("Password:")
+    print(form.password)
+    print("--------------")
     if form.validate_on_submit():
         # Generar el hash de la contraseña
         hashed_password = bcrypt.generate_password_hash(
@@ -86,14 +99,14 @@ def signup():
 
 
 @main.route('/logout')
-# @login_required
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('main.login'))
 
 
 @main.route('/ask', methods=['GET', 'POST'])
-# @login_required
+@login_required
 def ask():
     form = QuestionForm()
     if form.validate_on_submit():
@@ -106,7 +119,7 @@ def ask():
 
 
 @main.route('/question/<int:question_id>', methods=['GET', 'POST'])
-# @login_required
+@login_required
 def question(question_id):
     question = Question.query.get_or_404(question_id)
     form = AnswerForm()
