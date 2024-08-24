@@ -25,12 +25,11 @@
             <div class="relative">
                 <div class="flex items-center space-x-4 cursor-pointer" id="userMenu" onclick="toggleDropdown()">
                     <!-- Nombre del usuario -->
-                    <span class="text-gray-700 font-medium">Sebastian Sosa</span>
+                    <span class="text-gray-700 font-medium">{{ session['username'] }}</span>
                     <!-- Foto del usuario -->
                     <img src="https://via.placeholder.com/40" alt="Foto de perfil"
                         class="w-10 h-10 rounded-full border border-gray-300">
                 </div>
-
                 <!-- Menú desplegable -->
                 <div id="dropdownMenu"
                     class="dropdown-menu absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2">
@@ -41,159 +40,50 @@
             </div>
         </div>
     </header>
-
     <main class="container mx-auto mt-4 mb-5">
         <div class="flex justify-between items-center mb-6">
             <div>
                 <h2 class="text-3xl font-semibold text-gray-800">Todas las preguntas</h2>
-                <p class="text-gray-500">521,134 preguntas</p>
+                <p class="text-gray-500">{{ questions|length }} preguntas</p>
             </div>
             <a href="/ask_question"
                 class="bg-orange-400 text-white font-medium py-2 px-4 rounded-md hover:bg-orange-500">Preguntar</a>
         </div>
-
         <div class="space-y-4">
+            {% for question in questions %}
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                 <div class="flex justify-between items-start">
                     <div>
-                        <span class="text-gray-700 font-semibold">123 Votos</span>
-                        <span class="text-gray-500">59 Respuestas</span>
-                        <a href="/ask">
-                            <h3 class="text-xl font-bold text-orange-400 mt-2">Lorem ipsum dolor sit amet.</h3>
-                        </a>
-                        <p class="text-gray-600 mt-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
-                            lacinia pharetra dapibus...</p>
-                        <div class="flex space-x-2 mt-2">
-                            <span class="bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-sm">Física</span>
-                            <span class="bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-sm">Química</span>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-gray-500 text-sm">Hace 2 min</p>
-                        <p class="text-gray-600 text-sm">Sebastian Sosa</p>
-                    </div>
-                </div>
-            </div>
-            <!-- Repetir este bloque para cada pregunta -->
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <span class="text-gray-700 font-semibold">10 Votos</span>
-                        <span class="text-gray-500">20 Respuestas</span>
-                        <a href="/ask">
-                            <h3 class="text-xl font-bold text-orange-400 mt-2">Lorem ipsum dolor sit amet.</h3>
-                        </a>
-                        <p class="text-gray-600 mt-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
-                            lacinia pharetra dapibus...</p>
-                        <div class="flex space-x-2 mt-2">
-                            <span class="bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-sm">Física</span>
-                            <span class="bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-sm">Química</span>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-gray-500 text-sm">Hace 2 min</p>
-                        <p class="text-gray-600 text-sm">Sebastian Sosa</p>
-                    </div>
-                </div>
-            </div>
-            <!-- Fin del bloque repetido -->
+                        <!-- Mostrar 0 si no hay votos -->
+                        <span class="text-gray-700 font-semibold">{{ question.total_votes if question.total_votes is not
+                            none else 0 }} Votos</span>
 
-            <!-- Repetir este bloque para cada pregunta -->
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <span class="text-gray-700 font-semibold">10 Votos</span>
-                        <span class="text-gray-500">20 Respuestas</span>
+                        <!-- Mostrar 0 si no hay respuestas -->
+                        <span class="text-gray-500">{{ question.total_answers if question.total_answers is not none else
+                            0 }} Respuestas</span>
+
                         <a href="/ask">
-                            <h3 class="text-xl font-bold text-orange-400 mt-2">Lorem ipsum dolor sit amet.</h3>
+                            <h3 class="text-xl font-bold text-orange-400 mt-2">{{ question.title }}</h3>
                         </a>
-                        <p class="text-gray-600 mt-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
-                            lacinia pharetra dapibus...</p>
+                        <p class="text-gray-600 mt-1">{{ question.content[:100] }}...</p>
+
                         <div class="flex space-x-2 mt-2">
-                            <span class="bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-sm">Física</span>
-                            <span class="bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-sm">Química</span>
+                            {% if question.tags %}
+                            {% for tag in question.tags %}
+                            <span class="bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-sm">{{ tag }}</span>
+                            {% endfor %}
+                            {% else %}
+                            <span class="text-gray-500 text-sm">No tags</span>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="text-right">
-                        <p class="text-gray-500 text-sm">Hace 2 min</p>
-                        <p class="text-gray-600 text-sm">Sebastian Sosa</p>
+                        <p class="text-gray-500 text-sm" data-created-at="{{ question.created_at.isoformat() }}"></p>
+                        <p class="text-gray-600 text-sm">{{ question.author.username }}</p>
                     </div>
                 </div>
             </div>
-            <!-- Fin del bloque repetido -->
-
-            <!-- Repetir este bloque para cada pregunta -->
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <span class="text-gray-700 font-semibold">10 Votos</span>
-                        <span class="text-gray-500">20 Respuestas</span>
-                        <a href="/ask">
-                            <h3 class="text-xl font-bold text-orange-400 mt-2">Lorem ipsum dolor sit amet.</h3>
-                        </a>
-                        <p class="text-gray-600 mt-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
-                            lacinia pharetra dapibus...</p>
-                        <div class="flex space-x-2 mt-2">
-                            <span class="bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-sm">Física</span>
-                            <span class="bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-sm">Química</span>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-gray-500 text-sm">Hace 2 min</p>
-                        <p class="text-gray-600 text-sm">Sebastian Sosa</p>
-                    </div>
-                </div>
-            </div>
-            <!-- Fin del bloque repetido -->
-
-            <!-- Repetir este bloque para cada pregunta -->
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <span class="text-gray-700 font-semibold">10 Votos</span>
-                        <span class="text-gray-500">20 Respuestas</span>
-                        <a href="/ask">
-                            <h3 class="text-xl font-bold text-orange-400 mt-2">Lorem ipsum dolor sit amet.</h3>
-                        </a>
-                        <p class="text-gray-600 mt-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
-                            lacinia pharetra dapibus...</p>
-                        <div class="flex space-x-2 mt-2">
-                            <span class="bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-sm">Física</span>
-                            <span class="bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-sm">Química</span>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-gray-500 text-sm">Hace 2 min</p>
-                        <p class="text-gray-600 text-sm">Sebastian Sosa</p>
-                    </div>
-                </div>
-            </div>
-            <!-- Fin del bloque repetido -->
-
-            <!-- Repetir este bloque para cada pregunta -->
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <span class="text-gray-700 font-semibold">10 Votos</span>
-                        <span class="text-gray-500">20 Respuestas</span>
-                        <a href="/ask">
-                            <h3 class="text-xl font-bold text-orange-400 mt-2">Lorem ipsum dolor sit amet.</h3>
-                        </a>
-                        <p class="text-gray-600 mt-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
-                            lacinia pharetra dapibus...</p>
-                        <div class="flex space-x-2 mt-2">
-                            <span class="bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-sm">Física</span>
-                            <span class="bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-sm">Química</span>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-gray-500 text-sm">Hace 2 min</p>
-                        <p class="text-gray-600 text-sm">Sebastian Sosa</p>
-                    </div>
-                </div>
-            </div>
-            <!-- Fin del bloque repetido -->
-
+            {% endfor %}
         </div>
     </main>
 
@@ -212,6 +102,33 @@
                 }
             }
         }
+
+        function timeAgo(dateString) {
+            const now = new Date();
+            const date = new Date(dateString);
+            const diffInSeconds = Math.floor((now - date) / 1000);
+
+            const intervals = {
+                y: Math.floor(diffInSeconds / 31536000),
+                m: Math.floor(diffInSeconds / 2592000),
+                d: Math.floor(diffInSeconds / 86400),
+                h: Math.floor(diffInSeconds / 3600),
+                mi: Math.floor(diffInSeconds / 60),
+                s: diffInSeconds
+            };
+
+            if (intervals.y >= 1) return `Hace ${intervals.y} ${intervals.y === 1 ? 'año' : 'años'}`;
+            if (intervals.m >= 1) return `Hace ${intervals.m} ${intervals.m === 1 ? 'mes' : 'meses'}`;
+            if (intervals.d >= 1) return `Hace ${intervals.d} ${intervals.d === 1 ? 'día' : 'días'}`;
+            if (intervals.h >= 1) return `Hace ${intervals.h} ${intervals.h === 1 ? 'hora' : 'horas'}`;
+            if (intervals.mi >= 1) return `Hace ${intervals.mi} ${intervals.mi === 1 ? 'minuto' : 'minutos'}`;
+            return `Hace ${intervals.s} ${intervals.s === 1 ? 'segundo' : 'segundos'}`;
+        }
+
+        document.querySelectorAll('[data-created-at]').forEach(element => {
+            element.textContent = timeAgo(element.dataset.createdAt);
+        });
+
     </script>
 </body>
 

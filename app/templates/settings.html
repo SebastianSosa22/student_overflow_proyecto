@@ -14,7 +14,7 @@
             <h1 class="text-2xl font-bold text-gray-800"><a href="/">StudentOverflow</a></h1>
             <div class="relative">
                 <div class="flex items-center space-x-4 cursor-pointer" id="userMenu" onclick="toggleDropdown()">
-                    <span class="text-gray-700 font-medium">Sebastian Sosa</span>
+                    <span class="text-gray-700 font-medium">{{ session ['username'] }}</span>
                     <img src="https://via.placeholder.com/40" alt="Foto de perfil"
                         class="w-10 h-10 rounded-full border border-gray-300">
                 </div>
@@ -51,14 +51,14 @@
             <!-- Campo para el nombre -->
             <div class="mb-4">
                 <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
-                <input type="text" id="nombre" name="nombre" value="Sebastian Sosa"
+                <input type="text" id="nombre" name="nombre" value="{{ session['username'] }}"
                     class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
             </div>
 
             <!-- Campo para el correo electrónico -->
             <div class="mb-4">
                 <label for="email" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
-                <input type="email" id="email" name="email" value="sebastian.sosa@example.com"
+                <input type="email" id="email" name="email" value="{{ session['email'] }}"
                     class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
             </div>
 

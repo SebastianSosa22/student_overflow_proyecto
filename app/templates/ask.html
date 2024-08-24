@@ -25,7 +25,7 @@
             <div class="relative">
                 <div class="flex items-center space-x-4 cursor-pointer" id="userMenu" onclick="toggleDropdown()">
                     <!-- Nombre del usuario -->
-                    <span class="text-gray-700 font-medium">Sebastian Sosa</span>
+                    <span class="text-gray-700 font-medium">{{ session['username'] }}</span>
                     <!-- Foto del usuario -->
                     <img src="https://via.placeholder.com/40" alt="Foto de perfil"
                         class="w-10 h-10 rounded-full border border-gray-300">
@@ -71,7 +71,7 @@
             </div>
             <div class="flex justify-between items-center mt-6 border-t pt-4">
                 <div class="flex items-center">
-                    <span class="text-gray-600 font-semibold">Sebastian Sosa</span>
+                    <span class="text-gray-600 font-semibold">{{ session['username'] }}</span>
                     <span class="text-gray-500 ml-4">Hace 2 min</span>
                 </div>
                 <a href="/answer"

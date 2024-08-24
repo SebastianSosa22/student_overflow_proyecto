@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, redirect, url_for, request, jsonify
-from flask_login import login_user, login_required, logout_user, current_user, LoginManager
+from datetime import datetime
+from flask import Blueprint, render_template, redirect, url_for, request, session
+from flask_login import login_user, login_required, logout_user, current_user
 from flask_jwt_extended import create_access_token
 from .models import db, User, Question, Answer
 from .forms import LoginForm, SignupForm, QuestionForm, AnswerForm
@@ -8,19 +9,83 @@ from . import bcrypt
 main = Blueprint('main', __name__)
 
 
+def format_time_diff(time_diff):
+    days = time_diff.days
+    seconds = time_diff.seconds
+
+    hours, remainder = divmod(seconds, 3600)
+    minutes, _ = divmod(remainder, 60)
+
+    if days > 0:
+        if days == 1:
+            return "hace 1 día"
+        elif days < 30:
+            return f"hace {days} días"
+        elif days < 365:
+            return f"hace {days // 30} meses"
+        else:
+            return f"hace {days // 365} años"
+    elif hours > 0:
+        return f"hace {hours} horas"
+    elif minutes > 0:
+        return f"hace {minutes} minutos"
+    else:
+        return "hace unos segundos"
+
+
+@main.before_request
+def before_request():
+    if current_user.is_authenticated:
+        session['username'] = current_user.username
+        session['email'] = current_user.email
+
+
 @main.route('/')
 @login_required
 def home():
-    print("Hola mundo")
-    questions = Question.query.all()
-    return render_template('index.html', questions=questions)
+    page = request.args.get('page', 1, type=int)
+    per_page = 10  # Número de preguntas por página
+    questions = Question.query.paginate(page, per_page, error_out=False)
+    now = datetime.utcnow()
+    for question in questions.items:
+        if question.created_at:
+            time_diff = now - question.created_at
+            print(f"Pregunta ID: {question.id}, Created At: {
+                  question.created_at}, Time Diff: {time_diff}")
+            question.time_ago = format_time_diff(time_diff)
+        else:
+            question.time_ago = "Fecha no disponible"
+
+        # Asegúrate de que 'tags' es una lista
+        if question.tags is None:
+            question.tags = []
+
+    return render_template('index.html', questions=questions.items, pagination=questions)
 
 
-@main.route('/ask_question')
+@main.route('/ask_question', methods=['GET', 'POST'])
 @login_required
 def ask_question():
-    questions = Question.query.all()
-    return render_template('ask_question.html', questions=questions)
+    if request.method == 'POST':
+        title = request.form.get('titulo')
+        content = request.form.get('detalle')
+        tags = request.form.get('etiquetas').split(
+            ',')  # Convertir las etiquetas en una lista
+
+        if len(title) > 0 and len(content) > 20:  # Validaciones básicas
+            new_question = Question(
+                title=title,
+                content=content,
+                creator=current_user,
+                tags=tags
+            )
+            db.session.add(new_question)
+            db.session.commit()
+            # Redirigir a la página principal o a otra página
+            return redirect(url_for('main.home'))
+
+    # Asegúrate de que el nombre del template es correcto
+    return render_template('ask_question.html')
 
 
 @main.route('/answer')
@@ -48,52 +113,29 @@ def settings():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        print(form.email.data)
         user = User.query.filter_by(email=form.email.data).first(
         ) or User.query.filter_by(username=form.email.data).first()
-        print(user)
-        if user:
-            try:
-                if bcrypt.check_password_hash(user.password, form.password.data):
-                    login_user(user)
-                    print("Inicio de sesion correcto")
-                    access_token = create_access_token(
-                        identity={'username': user.username, 'role': user.role})
-                    return redirect(url_for('main.home'))
-                else:
-                    return jsonify({"msg": "Bad username or password"}), 401
-            except ValueError as e:
-                print(f"Error checking password hash: {e}")
-                return jsonify({"msg": "Invalid password hash"}), 500
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
+            login_user(user)
+            access_token = create_access_token(
+                identity={'username': user.username, 'role': user.role})
+            return redirect(url_for('main.home'))
         else:
-            return redirect(url_for('main.login'))
+            error = "Correo o contraseña incorrectos. Por favor, intenta de nuevo."
+            return render_template('login.html', form=form, error=error)
     return render_template('login.html', form=form)
 
 
 @main.route('/register', methods=['GET', 'POST'])
 def signup():
     form = SignupForm()
-    print("--------------")
-    print("Username:")
-    print(form.username)
-    print("Email:")
-    print(form.email)
-    print("Password:")
-    print(form.password)
-    print("--------------")
     if form.validate_on_submit():
-        # Generar el hash de la contraseña
         hashed_password = bcrypt.generate_password_hash(
             form.password.data).decode('utf-8')
-
-        # Crear un nuevo usuario con el hash de la contraseña
         new_user = User(username=form.username.data, email=form.email.data,
                         password=hashed_password, role='standard')
-
-        # Agregar el nuevo usuario a la base de datos
         db.session.add(new_user)
         db.session.commit()
-
         return redirect(url_for('main.login'))
     return render_template('register.html', form=form)
 
@@ -111,7 +153,7 @@ def ask():
     form = QuestionForm()
     if form.validate_on_submit():
         new_question = Question(title=form.title.data,
-                                content=form.content.data, author=current_user)
+                                content=form.content.data, creator=current_user)
         db.session.add(new_question)
         db.session.commit()
         return redirect(url_for('main.home'))
