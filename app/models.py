@@ -1,4 +1,4 @@
-from datetime import datetime  # Importa datetime
+from datetime import datetime
 from . import db
 from flask_login import UserMixin
 from sqlalchemy.dialects.postgresql import ARRAY
@@ -11,13 +11,9 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
     role = db.Column(db.String(50), nullable=False)
-    # Usa un nombre único para evitar conflictos
+    # Cambio de nombre del backref a 'user_answers' para evitar conflicto
     questions = db.relationship('Question', backref='creator', lazy=True)
-    answers = db.relationship('Answer', backref='author', lazy=True)
-
-    @property
-    def is_active(self):
-        return True
+    answers = db.relationship('Answer', backref='answer_author', lazy=True)
 
 
 class Question(db.Model):
@@ -31,7 +27,6 @@ class Question(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     author = db.relationship(
         'User', backref=db.backref('user_questions', lazy=True))
-    # Usando ARRAY para almacenar tags
     tags = db.Column(ARRAY(db.String), default=list)
 
 
@@ -41,5 +36,23 @@ class Answer(db.Model):
     content = db.Column(db.Text, nullable=False)
     question_id = db.Column(db.Integer, db.ForeignKey(
         'questions.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    author_id = db.Column(
+        db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    author = db.relationship(
+        'User', backref=db.backref('user_answers', lazy=True))
+    question = db.relationship(
+        'Question', backref=db.backref('answers', lazy=True))
+
+
+class Vote(db.Model):
+    __tablename__ = 'votes'
+    id = db.Column(db.Integer, primary_key=True)
+
+    # Clave foránea a usuarios
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    # Clave foránea a preguntas
+    question_id = db.Column(db.Integer, db.ForeignKey(
+        'questions.id'), nullable=False)

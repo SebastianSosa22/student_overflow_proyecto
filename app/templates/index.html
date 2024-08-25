@@ -59,12 +59,12 @@
                             none else 0 }} Votos</span>
 
                         <!-- Mostrar 0 si no hay respuestas -->
-                        <span class="text-gray-500">{{ question.total_answers if question.total_answers is not none else
-                            0 }} Respuestas</span>
+                        <span class="text-gray-500">{{ question.answers|length }} Respuestas</span>
 
-                        <a href="/ask">
+                        <a href="{{ url_for('main.question', question_id=question.id) }}">
                             <h3 class="text-xl font-bold text-orange-400 mt-2">{{ question.title }}</h3>
                         </a>
+
                         <p class="text-gray-600 mt-1">{{ question.content[:100] }}...</p>
 
                         <div class="flex space-x-2 mt-2">

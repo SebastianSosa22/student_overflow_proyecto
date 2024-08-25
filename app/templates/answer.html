@@ -7,7 +7,6 @@
     <title>Pregunta - StudentOverflow</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Estilo adicional para el menú desplegable */
         .dropdown-menu {
             display: none;
         }
@@ -24,14 +23,10 @@
             <h1 class="text-2xl font-bold text-gray-800"><a href="/">StudentOverflow</a></h1>
             <div class="relative">
                 <div class="flex items-center space-x-4 cursor-pointer" id="userMenu" onclick="toggleDropdown()">
-                    <!-- Nombre del usuario -->
                     <span class="text-gray-700 font-medium">{{ session['username'] }}</span>
-                    <!-- Foto del usuario -->
                     <img src="https://via.placeholder.com/40" alt="Foto de perfil"
                         class="w-10 h-10 rounded-full border border-gray-300">
                 </div>
-
-                <!-- Menú desplegable -->
                 <div id="dropdownMenu"
                     class="dropdown-menu absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2">
                     <a href="/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Perfil</a>
@@ -43,10 +38,8 @@
     </header>
 
     <main class="container mx-auto mt-8">
-        <!-- Flecha de Regreso -->
         <div class="mb-4">
             <a href="javascript:history.back()" class="flex items-center text-gray-700 hover:text-gray-900">
-                <!-- Ícono de flecha hacia la izquierda -->
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -55,41 +48,46 @@
             </a>
         </div>
 
-        <!-- Pregunta -->
         <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-8">
             <div class="mb-4">
-                <span class="text-gray-700 font-semibold text-lg">123 Votos</span>
-                <span class="text-gray-500 text-lg">5 Respuestas</span>
+                <span class="text-gray-700 font-semibold text-lg">{{ question.total_votes }} Votos</span>
+                <span class="text-gray-500 text-lg">{{ question.answers|length }} Respuestas</span>
             </div>
-            <h2 class="text-3xl font-bold text-orange-400">Lorem ipsum dolor sit amet.</h2>
-            <p class="text-gray-600 mt-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin lacinia
-                pharetra dapibus. Curabitur eu sapien lacus. Etiam venenatis felis non ultricies fermentum. Aenean
-                luctus laoreet justo, nec tincidunt turpis efficitur sit amet. Proin placerat volutpat.</p>
+            <h2 class="text-3xl font-bold text-orange-400">{{ question.title }}</h2>
+            <p class="text-gray-600 mt-2">{{ question.content }}</p>
             <div class="flex space-x-2 mt-4">
-                <span class="bg-gray-200 text-gray-600 px-3 py-1 rounded-full text-sm">Física</span>
-                <span class="bg-gray-200 text-gray-600 px-3 py-1 rounded-full text-sm">Química</span>
+                {% for tag in question.tags %}
+                <span class="bg-gray-200 text-gray-600 px-3 py-1 rounded-full text-sm">{{ tag }}</span>
+                {% endfor %}
             </div>
             <div class="flex justify-between items-center mt-6 border-t pt-4">
                 <div class="flex items-center">
-                    <span class="text-gray-600 font-semibold">{{ session['username'] }}</span>
-                    <span class="text-gray-500 ml-4">Hace 2 min</span>
+                    <span class="text-gray-600 font-semibold">{{ question.author.username }}</span>
+                    <span class="text-gray-500 ml-4" data-created-at="{{ question.created_at.isoformat() }}"></span>
                 </div>
             </div>
         </div>
 
-        <!-- Formulario de Respuesta -->
-        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div class="bg-white p-6 mb-8 rounded-lg shadow-sm border border-gray-200">
             <h3 class="text-xl font-semibold text-gray-800">Tu respuesta</h3>
             <p class="text-gray-500 mb-4">Mínimo 20 caracteres.</p>
-            <textarea id="respuestaTextarea" placeholder="Placeholder" rows="6" maxlength="500"
-                class="w-full p-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent resize-none mb-2"></textarea>
-            <p id="errorMensaje" class="text-red-500 hidden">Tu respuesta debe tener al menos 20 caracteres.</p>
-            <div class="flex justify-between items-center">
-                <span id="caracteresContador" class="text-gray-500 text-sm">0/500</span>
-                <button id="publicarButton"
-                    class="bg-orange-400 text-white font-medium py-2 px-4 rounded-md hover:bg-orange-500">Publica tu
-                    Respuesta</button>
-            </div>
+            {% if error %}
+            <div class="text-red-500 mb-4">{{ error }}</div>
+            {% endif %}
+            <form method="POST">
+                {{ form.csrf_token }}
+                <textarea id="respuestaTextarea" name="content" placeholder="Escribe tu respuesta aquí..." rows="6"
+                    maxlength="500"
+                    class="w-full p-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent resize-none mb-2"></textarea>
+                <p id="errorMensaje" class="text-red-500 hidden">Tu respuesta debe tener al menos 20 caracteres.</p>
+                <div class="flex justify-between items-center">
+                    <span id="caracteresContador" class="text-gray-500 text-sm">0/500</span>
+                    <button id="publicarButton" type="submit"
+                        class="bg-orange-400 text-white font-medium py-2 px-4 rounded-md hover:bg-orange-500">Publica tu
+                        Respuesta</button>
+                </div>
+            </form>
+
         </div>
     </main>
 
@@ -99,7 +97,6 @@
             dropdownMenu.classList.toggle("show");
         }
 
-        // Cerrar el menú si se hace clic fuera de él
         window.onclick = function (event) {
             var dropdownMenu = document.getElementById("dropdownMenu");
             if (!event.target.closest('#userMenu')) {
@@ -109,7 +106,6 @@
             }
         }
 
-        // Validar longitud de la respuesta
         const respuestaTextarea = document.getElementById('respuestaTextarea');
         const publicarButton = document.getElementById('publicarButton');
         const errorMensaje = document.getElementById('errorMensaje');
@@ -118,6 +114,7 @@
         respuestaTextarea.addEventListener('input', function () {
             const respuestaLength = respuestaTextarea.value.length;
             caracteresContador.textContent = `${respuestaLength}/500`;
+            console.log(`Longitud actual de la respuesta: ${respuestaLength}`); // Debugging
 
             if (respuestaLength >= 20) {
                 errorMensaje.classList.add('hidden');
@@ -128,6 +125,7 @@
 
         publicarButton.addEventListener('click', function (event) {
             const respuestaLength = respuestaTextarea.value.length;
+            console.log(`Longitud de la respuesta al intentar publicar: ${respuestaLength}`); // Debugging
 
             if (respuestaLength < 20) {
                 event.preventDefault();
@@ -135,6 +133,33 @@
             }
         });
 
+        function timeAgo(dateString) {
+            const now = new Date();
+            const date = new Date(dateString);
+            const diffInSeconds = Math.floor((now - date) / 1000);
+
+            const intervals = {
+                y: Math.floor(diffInSeconds / 31536000),
+                m: Math.floor(diffInSeconds / 2592000),
+                d: Math.floor(diffInSeconds / 86400),
+                h: Math.floor(diffInSeconds / 3600),
+                mi: Math.floor(diffInSeconds / 60),
+                s: diffInSeconds
+            };
+
+            if (intervals.y >= 1) return `Hace ${intervals.y} ${intervals.y === 1 ? 'año' : 'años'}`;
+            if (intervals.m >= 1) return `Hace ${intervals.m} ${intervals.m === 1 ? 'mes' : 'meses'}`;
+            if (intervals.d >= 1) return `Hace ${intervals.d} ${intervals.d === 1 ? 'día' : 'días'}`;
+            if (intervals.h >= 1) return `Hace ${intervals.h} ${intervals.h === 1 ? 'hora' : 'horas'}`;
+            if (intervals.mi >= 1) return `Hace ${intervals.mi} ${intervals.mi === 1 ? 'minuto' : 'minutos'}`;
+            return `Hace ${intervals.s} ${intervals.s === 1 ? 'segundo' : 'segundos'}`;
+        }
+
+        document.querySelectorAll('[data-created-at]').forEach(elem => {
+            const createdAt = elem.getAttribute('data-created-at');
+            console.log(`Fecha de creación: ${createdAt}`); // Debugging
+            elem.textContent = timeAgo(createdAt);
+        });
     </script>
 </body>
 
