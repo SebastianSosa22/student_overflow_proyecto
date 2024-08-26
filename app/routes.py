@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from flask import Blueprint, render_template, redirect, url_for, request, session, flash
+from flask import Blueprint, render_template, redirect, url_for, request, session
 from flask_login import login_user, login_required, logout_user, current_user
 from .models import db, User, Question, Answer
 from .forms import LoginForm, SignupForm, AnswerForm
@@ -193,3 +193,14 @@ def answer(question_id):
     # Registro de depuración
     logging.debug(f"Formulario enviado: {form.validate_on_submit()}")
     return render_template('answer.html', question=question, form=form)
+
+
+# @main.route('/tags', methods=['GET'])
+# @login_required
+# def get_tags():
+#     """
+#     Devuelve las etiquetas existentes en la base de datos en formato JSON.
+#     """
+#     tags = Tags.query.all()  # Asegúrate de que el modelo Tag esté importado
+#     tag_names = [tag.name for tag in tags]
+#     return jsonify(tag_names)
